@@ -13,6 +13,7 @@ model Client {
   phone          String
   cadenceDays    Int          @default(14)
   autoTexts      Boolean      @default(true)
+  optedOut       Boolean      @default(false)
   reengageStatus String       @default("none") // none | sent | rebooked | no-response
   createdAt      DateTime     @default(now())
   history        Visit[]
