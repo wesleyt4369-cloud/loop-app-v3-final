@@ -1,0 +1,47 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Client {
+  id             String       @id @default(cuid())
+  name           String
+  phone          String
+  cadenceDays    Int          @default(14)
+  autoTexts      Boolean      @default(true)
+  reengageStatus String       @default("none") // none | sent | rebooked | no-response
+  createdAt      DateTime     @default(now())
+  history        Visit[]
+  appointment    Appointment?
+  messages       Message[]
+}
+
+model Visit {
+  id       String   @id @default(cuid())
+  date     DateTime @default(now())
+  note     String
+  clientId String
+  client   Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}
+
+model Appointment {
+  id       String   @id @default(cuid())
+  date     DateTime // the calendar date of the appointment
+  time     String   // display string, e.g. "2:30 PM"
+  status   String   @default("upcoming") // upcoming | reminder-sent | confirmed | no-show | rebooked
+  clientId String   @unique
+  client   Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  from      String   // "business" | "client"
+  text      String
+  createdAt DateTime @default(now())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}
